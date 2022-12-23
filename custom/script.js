@@ -4,9 +4,9 @@ let params = (new URL(document.location)).searchParams;
 
 // model
 
-var inputLayerSize  = +(params.get('ils') ?? 3);
+var inputLayerSize  = +(params.get('ils') ?? 2);
 var outputLayerSize = +(params.get('ols') ?? 1);
-var hiddenLayerSize =  (params.get('hls') ?? '4').split(/,/g).map(v=>+v);
+var hiddenLayerSize =  (params.get('hls') ?? '4,4').split(/,/g).map(v=>+v);
 
 var mutationRate = +(params.get('mr') ?? 100);
 var batchSize =    +(params.get('bs') ?? 10);
@@ -15,14 +15,10 @@ var batchSize =    +(params.get('bs') ?? 10);
 var tests = (
     params.get('t') 
     ??
-    '0,0,0,0;'+
-    '0,0,1,1;'+
-    '0,1,0,1;'+
-    '0,1,1,0;'+
-    '1,0,0,1;'+
-    '1,0,1,0;'+
-    '1,1,0,0;'+
-    '1,1,1,1'
+    '0,0,0;'+
+    '0,1,1;'+
+    '1,0,1;'+
+    '1,1,0'
 ).split(';').filter(r=>r.length).map(r=>r.split(',').map(v=>+v));
 
 console.log(document.getElementById('data-table').children.item(0).children.item(0));
@@ -307,6 +303,18 @@ const render = () => {
             ctx.fill();
         }
     }
+}
+
+function export_url() {
+    let url = `${location.protocol+'//'+location.host+location.pathname}?${new URLSearchParams({
+        ils: inputLayerSize,
+        ols: outputLayerSize,
+        hls: hiddenLayerSize.join(','),
+        mr:  mutationRate,
+        bs:  batchSize,
+        t:   tests.map(r=>r.join(',')).join(';')
+    }).toString()}`;
+    navigator.clipboard.writeText(url);
 }
 
 setInterval(

@@ -7,11 +7,13 @@
             body {
                 font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
             }
-            #data-table {
-                text-align: center;
+            table {
                 border-collapse: collapse;
             }
-            #data-table > th,td {
+            #data-table {
+                text-align: center;
+            }
+            table > th,td {
                 border: 1px solid black;
             }
             td:has(button) {
@@ -27,17 +29,68 @@
             .invalid {
                 background-color: rgba(255, 0, 0, 0.2);
             }
+            #export-url, #error-value {
+                font-family: monospace;
+            }
+            #params-table {
+                max-width: 50em;
+            }
         </style>
         <script src="script.js" defer></script>
     </head>
 
     <body>
         <canvas id="canvas"></canvas>
+        <div style="background-color: rgba(200,200,0,0.4); width: fit-content;">
+            <script> if (location.search)document.currentScript.parentElement.remove(); </script>
+            <p>
+                This is an example model, to edit it, modify the URL to include these parameters:
+                <table id="params-table">
+                    <tr>
+                        <td>Name</td>
+                        <td>Default value</td>
+                        <td>Description</td>
+                    </tr>
+                    <tr>
+                        <td>ils</td>
+                        <td>2</td>
+                        <td>Input Layer Size, the amount of input nodes of the model</td>
+                    </tr>
+                    <tr>
+                        <td>ols</td>
+                        <td>1</td>
+                        <td>Output Layer Size, the amount of output nodes of the model</td>
+                    </tr>
+                    <tr>
+                        <td>hls</td>
+                        <td>4,4</td>
+                        <td>Hidden Layer Size, the amount of nodes of the hidden layers, separated by ','</td>
+                    </tr>
+                    <tr>
+                        <td>mr</td>
+                        <td>100</td>
+                        <td>Mutation Rate, the rate of evolution of the model, higher values help evolve it further if it gets stuck</td>
+                    </tr>
+                    <tr>
+                        <td>bs</td>
+                        <td>10</td>
+                        <td>Batch Size, the amount of variations of the model created to evolve it</td>
+                    </tr>
+                    <tr>
+                        <td>t</td>
+                        <td>0,0,0;<br>0,1,1;<br>1,0,1;<br>1,1,0</td>
+                        <td>Tests, the data used to train the AI, each row is separated by ';', the first values correspond to the input fed into the model, and the last ones the expected output of the model, separated by ','</td>
+                    </tr>
+                </table>
+            </p>
+        </div>
         <div>Cummulated Error:<br><span id="error-value"></span></div><br>
         <table id="data-table">
             <th><td>Input</td><td>Expected</td><td>Network</td></th>
             <tr><td><button onclick="add_item(this);">+</button></td></tr>
         </table>
+        <br>
+        <div>Export URL:<button onclick="export_url(this);">Click to copy</button></div>
     </body>
 
 </html>
