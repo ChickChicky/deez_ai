@@ -21,8 +21,6 @@ var tests = (
     '1,1,0'
 ).split(';').filter(r=>r.length).map(r=>r.split(',').map(v=>+v));
 
-console.log(document.getElementById('data-table').children.item(0).children.item(0));
-
 for (let row of tests) {
     document.getElementById('data-table').children.item(0).children.item(0).insertAdjacentHTML('afterend',`<tr> <td><button onclick="remove_item(this)">-</button></td> <td>${row.slice(0,-outputLayerSize).map(v=>`<input type="number" value="${v}"></input>`).join('')}</td> <td>${row.slice(-outputLayerSize).map(v=>`<input type="number" value="${v}"></input>`).join(',')}</td> <td>?</td> </tr>`);
 }
@@ -249,7 +247,7 @@ const render = () => {
         el.classList.add('model-output');
         //el.style.color = `rgb(${255 * ( 1 - ( 1 / (exp[i].map((e,j)=>Math.abs(e-val[i][j])).reduce((a,b)=>a+b,0) + 1 ) ) )},0,0)`;
         let errorFactor = exp[i].map((e,j)=>Math.abs(e-val[i][j])).reduce((a,b)=>a+b,0)/me;
-        if (Number.isNaN(errorFactor))
+        if (Number.isNaN(errorFactor) || me < 1e-20)
             el.style.color = `rgb(0,0,0)`;
         else
             el.style.color = `rgb(${errorFactor*255},0,0)`;
