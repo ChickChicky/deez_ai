@@ -127,24 +127,29 @@ function getError(tests,W,B) {
     return exp.map((e,i)=>Math.abs(e-val[i])).reduce((a,b)=>a+b,0);
 }
 
-let models = Array(batchSize).fill().map(
-    () => ({
-        // weights
-        W : [
-            // input weights
-            new Matrix(inputLayerSize,hiddenLayerSize[0],randomValue),
-            // neuron weights
-            ...hiddenLayerSize.slice(1).map(
-                (s,i) => new Matrix(hiddenLayerSize[i],s,randomValue)
-            ),
-            // output matrix
-            new Matrix(hiddenLayerSize.at(-1),outputLayerSize,randomValue)
-        ],
+let models;
 
-        // biases
-        B : hiddenLayerSize.map(s=>Array(s).fill().map(randomValue)).concat([Array(outputLayerSize).fill(0)])
-    })
-);
+function resetModel() {
+    models = Array(batchSize).fill().map(
+        () => ({
+            // weights
+            W : [
+                // input weights
+                new Matrix(inputLayerSize,hiddenLayerSize[0],randomValue),
+                // neuron weights
+                ...hiddenLayerSize.slice(1).map(
+                    (s,i) => new Matrix(hiddenLayerSize[i],s,randomValue)
+                ),
+                // output matrix
+                new Matrix(hiddenLayerSize.at(-1),outputLayerSize,randomValue)
+            ],
+    
+            // biases
+            B : hiddenLayerSize.map(s=>Array(s).fill().map(randomValue)).concat([Array(outputLayerSize).fill(0)])
+        })
+    );
+}
+resetModel();
 
 let model = models[0]; // just pick any model from the list
 
@@ -230,15 +235,24 @@ const render = () => {
     }
     tests = inputValues.map(r=>r.map(el=>+el.value));
 
-    document.getElementById('error-value').innerText = getError(tests,model.W,model.B).toFixed(19);
+    let err = getError(tests,model.W,model.B);
+    document.getElementById('error-value').innerText = err.toFixed(19);
 
-    let {val} = runTests(tests);
+    let {val,exp} = runTests(tests);
+    let me = Math.max(...val.map((v,i)=>v.map((vv,j)=>Math.abs(vv-exp[i][j])).reduce((a,b)=>a+b,0)))
 
     let outs = Array.from(document.body.getElementsByTagName('tr')).filter(tr=>Array.from(tr.children).some(c=>Array.from(c.getElementsByTagName('button')).some(b=>b.innerText=='-'))).map(e=>e.lastElementChild);
 
     for (let i in outs) {
         let el = outs[i];
-        el.innerText = val[i].map(v=>v.toFixed(3))
+        el.innerText = val[i].map(v=>v.toFixed(3));
+        el.classList.add('model-output');
+        //el.style.color = `rgb(${255 * ( 1 - ( 1 / (exp[i].map((e,j)=>Math.abs(e-val[i][j])).reduce((a,b)=>a+b,0) + 1 ) ) )},0,0)`;
+        let errorFactor = exp[i].map((e,j)=>Math.abs(e-val[i][j])).reduce((a,b)=>a+b,0)/me;
+        if (Number.isNaN(errorFactor))
+            el.style.color = `rgb(0,0,0)`;
+        else
+            el.style.color = `rgb(${errorFactor*255},0,0)`;
     }
 
     /*for (let i = 0; i < tests.length; i++) {

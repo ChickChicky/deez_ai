@@ -29,11 +29,15 @@
             .invalid {
                 background-color: rgba(255, 0, 0, 0.2);
             }
-            #export-url, #error-value {
+            #export-url, #error-value, .model-output {
                 font-family: monospace;
+                font-size:   medium;
             }
             #params-table {
                 max-width: 50em;
+            }
+            input {
+                max-width: 5em;
             }
         </style>
         <script src="script.js" defer></script>
@@ -82,6 +86,10 @@
                         <td>Tests, the data used to train the AI, each row is separated by ';', the first values correspond to the input fed into the model, and the last ones the expected output of the model, separated by ','</td>
                     </tr>
                 </table>
+                <br>
+                The table below can help you edit more easily the training data
+                <br>
+                The <em>Reset</em> button allows to reset the progress of the model, in case it is stuck
             </p>
         </div>
         <div>Cummulated Error:<br><span id="error-value"></span></div><br>
@@ -90,6 +98,8 @@
             <tr><td><button onclick="add_item(this);">+</button></td></tr>
         </table>
         <br>
+        <button onclick="resetModel(this)">Reset</button>
+        <br><br>
         <div>Export URL:<button onclick="export_url(this);">Click to copy</button></div>
     </body>
 
