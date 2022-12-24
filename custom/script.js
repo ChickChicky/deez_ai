@@ -29,7 +29,7 @@ var neural_fn = q => 1/(1+Math.E**-q);
 
 // visualzation
 
-var scale = 10;
+var scale = 5;
 
 var xStretch   =scale* 150,
     yStretch   =scale* 18,
@@ -125,9 +125,13 @@ function getError(tests,W,B) {
     return exp.map((e,i)=>Math.abs(e-val[i])).reduce((a,b)=>a+b,0);
 }
 
+let trainingInProgress = false;
+let generation = 0;
+
 let models;
 
 function resetModel() {
+    generation = 0;
     models = Array(batchSize).fill().map(
         () => ({
             // weights
@@ -151,10 +155,14 @@ resetModel();
 
 let model = models[0]; // just pick any model from the list
 
+let bestGeneration = [0,getError(tests,model.W,model.B)];
+
 /**
  * Trains the model once, finds the best model in the batch and creates slightly modified versions of it for the next batch
  */
-const train = () => {
+const train = async () => {
+    if (trainingInProgress) return;
+    trainingInProgress = true;
     let errors = models.map(m=>getError(tests,m.W,m.B)); // gets the error for all the models in the batch
     let bestValue = Math.min(...errors);                 // finds the best error
     let bestValueIndex = errors.indexOf(bestValue);      // finds the best error index
@@ -169,6 +177,9 @@ const train = () => {
             B : bestModel.B.map(row=>row.map(e=>e+randomValue())) // bestModel.B.slice(0,-1).map(row=>row.map(e=>e+randomValue())).concat([Array(outputLayerSize).fill(0)])
         })
     ).concat([model]);
+    if (bestGeneration[1] > bestValue) bestGeneration = [generation,bestValue]
+    generation++;
+    trainingInProgress = false;
 }
 
 function runTests(tests,W,B) {
@@ -221,6 +232,8 @@ const render = () => {
 
     // HTML stuff
 
+    document.getElementById('generation').innerText = generation;
+
     let inputValues = Array.from(document.body.getElementsByTagName('tr')).filter(tr=>Array.from(tr.children).some(c=>Array.from(c.getElementsByTagName('button')).some(b=>b.innerText=='-'))).map(tr=>Array.from(tr.getElementsByTagName('input')));
     for (let row of inputValues) {
         for (let el of row) {
@@ -237,7 +250,9 @@ const render = () => {
     document.getElementById('error-value').innerText = err.toFixed(19);
 
     let {val,exp} = runTests(tests);
-    let me = Math.max(...val.map((v,i)=>v.map((vv,j)=>Math.abs(vv-exp[i][j])).reduce((a,b)=>a+b,0)))
+    let me = Math.max(...val.map((v,i)=>v.map((vv,j)=>Math.abs(vv-exp[i][j])).reduce((a,b)=>a+b,0)));
+
+    document.getElementById('best-generation').innerText = `${bestGeneration[0]}`;
 
     let outs = Array.from(document.body.getElementsByTagName('tr')).filter(tr=>Array.from(tr.children).some(c=>Array.from(c.getElementsByTagName('button')).some(b=>b.innerText=='-'))).map(e=>e.lastElementChild);
 

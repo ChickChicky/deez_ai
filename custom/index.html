@@ -29,9 +29,9 @@
             .invalid {
                 background-color: rgba(255, 0, 0, 0.2);
             }
-            #export-url, #error-value, .model-output {
+            #export-url, #error-value, .model-output, #generation, #best-generation {
                 font-family: monospace;
-                font-size:   medium;
+                font-size:   large;
             }
             #params-table {
                 max-width: 50em;
@@ -44,6 +44,10 @@
     </head>
 
     <body>
+        <button onclick="resetModel(this)">Reset</button>
+        <div>Generation <span id="generation"></span></div>
+        <div>Best generation: <span id="best-generation">?</span></div>
+        <br>
         <canvas id="canvas"></canvas>
         <div style="background-color: rgba(200,200,0,0.4); width: fit-content;">
             <script> if (location.search)document.currentScript.parentElement.remove(); </script>
@@ -98,9 +102,7 @@
             <tr><td><button onclick="add_item(this);">+</button></td></tr>
         </table>
         <br>
-        <button onclick="resetModel(this)">Reset</button>
-        <br><br>
-        <div>Export URL:<button onclick="export_url(this);">Click to copy</button></div>
+        <div>Export URL: <button onclick="export_url(this);">Click to copy</button></div>
     </body>
 
 </html>
